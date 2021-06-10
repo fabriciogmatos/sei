@@ -1,3 +1,9 @@
 
 # remove codigo do sei/sip
-sei_docker/v3.0.10_BaseRef/
+#sei_docker/v3.0.10_BaseRef/dd
+
+# remove os arquivos sqls do SEI/SIP
+mysql/sqls
+
+# remove os arquivos fontes do SEI/SIP
+sei/codigo
