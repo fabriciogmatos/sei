@@ -1,40 +1,99 @@
-version: '2'
+version: '3'
+networks:
+  sei:
+    name: sei
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.110.0.0/24
 services:
-        jodconverter:
-                build: jodconverter
-                restart: always
-                ports:
-                        - 8080:8080       
+    jodconverter:
+        build: jodconverter
+        restart: always
+        ports:
+                - 8080:8080 
+        networks:
+            sei:
+                ipv4_address: 172.110.0.40
 
-        memcache:
-                build: memcache
-                restart: always
+    memcache:
+        build: memcache
+        restart: always
+        networks:
+            sei:
+                ipv4_address: 172.110.0.30
+        
+    db:
+        build: 
+        context: ./mysql
+        dockerfile: Dockerfile
+        # Definição de variaveis que seram utilizadas para configurar a aplicação no momento da criação da imagem do container.
+        args:
+            # Defina a url de acesso ao sistema
+            URL: localhost:12200
+            # coloque os dois arquivos sql's do SEI:  sei.sql e sip.sql
+            SQL: ./sqls
+            # Defina a sigla da sua Instituição.
+            SiglaOrgaoSistema: IFNMG
+            # Defina o nome da sua organização.
+            OrgamName: Instituto Federal do Norte de Minas Gerais
+        restart: always
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+            - 3306:3306
+        networks:
+            sei:
+                ipv4_address: 172.110.0.20
                 
-        mysql:
-                build: mysql
-                restart: always
-                environment:
-                        - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
-                ports:
-                        - 3306:3306
-                volumes:
-                        - /opt/volumes/mysql:/var/lib/mysql
-                          #        solr:
-                          #                build: solr
-                          #                restart: always
-                          #                ports:
-                          #                        - 8983:8983
-                          #                entrypoint:
-                          #                        - solr-precreate
-                          #                        - sei-protocolos
-        sei_docker:
-                build: sei_docker
-                restart: always
-                ports:
-                        - 80:80
-                links:
-                        - mysql:mysql
-                        - jodconverter:jod
-                        - memcache:memcache
-                environment:
-                        - SEI_URL=http://localhost
+#        solr:
+#                build: solr
+#                restart: always
+#                ports:
+#                        - 8983:8983
+#                entrypoint:
+#                        - solr-precreate
+#                        - sei-protocolos
+
+    app:
+        build:
+            context: ./sei
+            dockerfile: Dockerfile
+            # Definição de variaveis que seram utilizadas para configurar a aplicação no momento da criação da imagem do container.
+            args:
+                # Defina a url de acesso ao sistema.
+                URL: localhost:12200
+                # Diretório com o código fonte do SEI.
+                FONTES: ./codigo
+                # Defina a sigla da sua Instituição.
+                SiglaOrgaoSistema: IFNMG
+                # Defina o nome da sua organização.
+                OrgamName: Instituto Federal do Norte de Minas Gerais
+                # servidor do banco de dados.
+                db_host: sei_db_1
+                # usuário do banco de dados.
+                db_user: root
+                # senha do usuário do banco de dados.
+                db_pass: 
+                # porta do banco de dados.
+                db_port: 3306
+                # banco de dados do SIP.
+                db_sip: sip
+                # banco de dados do SEI.
+                db_sei: sei
+                # Servidor cache.
+                CacheSip: sei_memcache_1
+                # Servidor JODConverter.
+                JODConverter: sei_jodconverter_1
+        restart: always
+        ports:
+            - 12200:80
+        links:
+            - db:mysql
+            - jodconverter:jod
+            - memcache:memcache
+        environment:
+            - SEI_URL=http://localhost:12200
+        networks:
+            sei:
+                ipv4_address: 172.110.0.10
