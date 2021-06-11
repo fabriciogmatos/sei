@@ -20,8 +20,8 @@ else
 	mysql -u root -e "GRANT ALL PRIVILEGES ON sei.* TO 'sei_user'@'%'" sei
 
 	# Restauração dos bancos de dados
-	mysql -u root sei < /tmp/sei_3_0_0_BD_Ref_Exec.sql
-	mysql -u root sip < /tmp/sip_3_0_0_BD_Ref_Exec.sql
+	mysql -u root sei < /tmp/sei.sql
+	mysql -u root sip < /tmp/sip.sql
 
 	# Atualização dos parâmetros do SEI e do SIP
 	mysql -u root -e "update orgao set sigla='ABC', descricao='ORGAO ABC' where id_orgao=0;" sip
