@@ -25,18 +25,18 @@ services:
         
     db:
         build: 
-        context: ./mysql
-        dockerfile: Dockerfile
-        # Definição de variaveis que seram utilizadas para configurar a aplicação no momento da criação da imagem do container.
-        args:
-            # Defina a url de acesso ao sistema
-            URL: localhost:12200
-            # coloque os dois arquivos sql's do SEI:  sei.sql e sip.sql
-            SQL: ./sqls
-            # Defina a sigla da sua Instituição.
-            SiglaOrgaoSistema: IFNMG
-            # Defina o nome da sua organização.
-            OrgamName: Instituto Federal do Norte de Minas Gerais
+            context: ./mysql
+            dockerfile: Dockerfile
+            # Definição de variaveis que seram utilizadas para configurar a aplicação no momento da criação da imagem do container.
+            args:
+                # Defina a url de acesso ao sistema
+                URL: localhost:12200
+                # coloque os dois arquivos sql's do SEI:  sei.sql e sip.sql
+                SQL: ./sqls
+                # Defina a sigla da sua Instituição.
+                SiglaOrgaoSistema: IFNMG
+                # Defina o nome da sua organização.
+                OrgamName: Instituto Federal do Norte de Minas Gerais
         restart: always
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
